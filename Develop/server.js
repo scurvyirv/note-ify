@@ -22,13 +22,10 @@ app.use(express.urlencoded({ extended: true }));
 //define database data 
 const dbData = require('./db/db.json');
 
-//create GET method for dbData returned in JSON
+//GET method for dbData returned in JSON
 app.get('/api/notes', (req, res) => res.json(dbData));
 
 //POST method for dbData from db.json 
-//* `POST /api/notes` should receive a new note to save on the request body, add it to the `db.json` file, and then return the new note to the client. You'll need to find a way to give each note a unique id when it's saved (look into npm packages that could do this for you).
-
-//post method to saveNote
 app.post('/api/notes', (req, res) => {
     //log that POST request was received
     console.info(`${req.method} request was received to save note`)
@@ -38,7 +35,7 @@ app.post('/api/notes', (req, res) => {
 
     if (title && text) {
         //variable for the object we will save
-        const newSavedNote = {
+        const newNote = {
             title,
             text,
             userID: uuidv4(),
@@ -50,18 +47,17 @@ app.post('/api/notes', (req, res) => {
                 res.status(500).send('Error reading notes file.');
             } else {
                 let notes = JSON.parse(data);
-                notes.push(newSavedNote);
+                notes.push(newNote);
 
-                fs.writeFile('./db/db.json', JSON.stringify(notes, null, 4), (writeErr) => {
+                return fs.writeFile('./db/db.json', JSON.stringify(notes, null, 4), (writeErr))
+            }
                     if (writeErr) {
                         console.error(writeErr);
                         res.status(500).send('Error saving note.');
                     } else {
                         console.info('Successfully updated saved notes');
-                        res.json(newSavedNote);
-                    }
-                });
-            }
+                        res.json(newNote);
+                    };
         });
     } else {
         res.status(400).send('Title and text are required for a note.');
