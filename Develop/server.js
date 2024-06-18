@@ -23,7 +23,13 @@ app.use(express.urlencoded({ extended: true }));
 const dbData = require('./db/db.json');
 
 //GET method for dbData returned in JSON
-app.get('/api/notes', (req, res) => res.json(dbData));
+app.get('/api/notes', (req, res) => {
+    fs.readFile('./db/db.json', 'utf8', (readErr, data) => {
+        console.log('file read')
+        console.log(data);
+        res.json(JSON.parse(data));
+    });
+});
 
 //POST method for dbData from db.json 
 app.post('/api/notes', (req, res) => {
@@ -31,7 +37,7 @@ app.post('/api/notes', (req, res) => {
     console.info(`${req.method} request was received to save note`)
 
     //destructure title and text from req.body
-    const {title, text} =req.body;
+    const { title, text } = req.body;
 
     if (title && text) {
         //variable for the object we will save
@@ -40,6 +46,7 @@ app.post('/api/notes', (req, res) => {
             text,
             userID: uuidv4(),
         };
+        console.log('new note', newNote);
 
         fs.readFile('./db/db.json', 'utf8', (readErr, data) => {
             if (readErr) {
@@ -49,25 +56,61 @@ app.post('/api/notes', (req, res) => {
                 let notes = JSON.parse(data);
                 notes.push(newNote);
 
-                return fs.writeFile('./db/db.json', JSON.stringify(notes, null, 4), (writeErr))
+                return fs.writeFile('./db/db.json', JSON.stringify(notes, null, 4), () => console.log('hello'))
             }
-                    if (writeErr) {
-                        console.error(writeErr);
-                        res.status(500).send('Error saving note.');
-                    } else {
-                        console.info('Successfully updated saved notes');
-                        res.json(newNote);
-                    };
         });
-    } else {
+
+        //the response to allow this route to complete
+        res.json('hello');
+
+        } else {
         res.status(400).send('Title and text are required for a note.');
     }
 });
 
+//DELETE method for dbData from db.json 
+app.delete('/api/notes/:id', (req, res) => {
+    //log that POST request was received
+    console.info(`${req.params.id} request was received to delete note`)
+
+    // //destructure title and text from req.body
+    // const { title, text } = req.body;
+
+    // if (title && text) {
+    //     //variable for the object we will save
+    //     const newNote = {
+    //         title,
+    //         text,
+    //         userID: uuidv4(),
+    //     };
+    //     console.log('new note', newNote);
+
+    //     fs.readFile('./db/db.json', 'utf8', (readErr, data) => {
+    //         if (readErr) {
+    //             console.error(readErr);
+    //             res.status(500).send('Error reading notes file.');
+    //         } else {
+    //             let notes = JSON.parse(data);
+    //             notes.push(newNote);
+
+    //             return fs.writeFile('./db/db.json', JSON.stringify(notes, null, 4), () => console.log('hello'))
+    //         }
+    //     });
+        
+    //     //the response to allow this route to complete
+    //     res.json('hello');
+
+    //     } else {
+    //     res.status(400).send('Title and text are required for a note.');
+    // }
+});
+
+
 //create express.js routes for default '/', '/index' = wildcard '/*', and '/notes' endpoints
 // app.get('/', (req, res) => res.sendFile('./public/index.html'));
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, './public/index.html')));
 app.get('/notes', (req, res) => res.sendFile(path.join(__dirname, './public/notes.html')));
+//wildcard to index.html
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, './public/index.html')));
 
 //create listen method to listen for incoming connections to specified PORT
 app.listen(PORT, () => console.log(`Note-ify app listening at http://localhost:${PORT}`));
