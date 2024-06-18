@@ -1,21 +1,12 @@
 [
     {
-        "title": "Test Title",
-        "text": "Test text"
-    },
-    {
-        "title": "JSON",
-        "text": "parse",
+        "title": "Sample Note 1",
+        "text": "You can click on the note on the left handside to view saved notes",
         "userID": "7efcb6c3-351f-455d-b143-dee429aad39e"
     },
     {
-        "title": "parse",
-        "text": "ley",
+        "title": "Sample Note 2",
+        "text": "We are working on updating the delete functionality of this app. Stay tuned :)",
         "userID": "7236b3c9-cc86-4c6c-8856-88b12247cdce"
-    },
-    {
-        "title": "does it",
-        "text": "still work",
-        "userID": "84af12e9-1f9d-4c40-af7a-9706b7857982"
     }
 ]
